@@ -1,0 +1,85 @@
+-- An online book store and need to keep track of what books they offer
+-- create a database named cc_user
+DROP SCHEMA IF EXISTS cc_user;
+CREATE SCHEMA cc_user;
+
+-- create three tables within the database named books, customers and orders
+CREATE TABLE cc_user.customers
+	(
+	customer_id INT NOT NULL,
+	first_name VARCHAR(100)	NOT NULL,
+	last_name VARCHAR(100) NOT NULL,
+	email_address VARCHAR(300) NULL,
+	home_phone VARCHAR(100)	NULL,
+	city VARCHAR(50) NULL,
+	state_name VARCHAR(50) NULL,
+	years_old INT NULL,
+    PRIMARY KEY(customer_id)
+    );
+
+CREATE TABLE cc_user.books
+	(
+	book_id INT NOT NULL,
+	title VARCHAR(100) NOT NULL,
+	author VARCHAR(100)	NOT NULL,
+	original_language VARCHAR(50) NOT NULL,
+	first_published INT NULL,
+	sales_in_millions DECIMAL(8,2)	NULL,
+	price DECIMAL(8,2) NULL,
+    PRIMARY KEY(book_id)
+	);
+
+CREATE TABLE cc_user.orders
+	(
+	order_id INT NOT NULL,
+	customer_id INT NOT NULL,
+	book_id INT NOT NULL,
+	quantity INT NOT NULL,
+	price_base DECIMAL(8,2)	NOT NULL,
+	order_date DATE NOT NULL,
+	ship_date DATE NULL,
+    PRIMARY KEY(order_id)
+	);
+
+-- import data from books.csv, customers.csv and orders.csv to the created tables using import wizard 
+-- look at the first 10 rows in each table; customers, orders, and books to get a feel for what is in each
+SELECT *
+FROM cc_user.books
+LIMIT 10;
+
+SELECT *
+FROM cc_user.customers
+LIMIT 10;
+
+SELECT *
+FROM cc_user.orders
+LIMIT 10;
+
+-- examine the indexes that already exist on the three tables
+SHOW indexes
+FROM cc_user.books;
+
+SHOW indexes
+FROM cc_user.customers;
+
+SHOW indexes
+FROM cc_user.orders;
+
+-- build an index on the customers table with first name and email address
+CREATE INDEX idx_contactinfo
+ON cc_user.customers(first_name, email_address);
+
+-- check speed to generate table
+EXPLAIN ANALYZE SELECT first_name, last_name
+FROM cc_user.customers;
+-- creating this index have increased size of the table and speed impacts on insert, update, and delete of records
+
+-- so we are dropping the index
+ALTER TABLE cc_user.customers
+DROP INDEX idx_contactinfo;
+
+EXPLAIN ANALYZE SELECT first_name, last_name
+FROM cc_user.customers;
+-- checked the time again and noted that time to generate has significantly reduced
+
+-- the end
